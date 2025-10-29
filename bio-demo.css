@@ -1,0 +1,39 @@
+/* Biometric demo styles (simple) */
+:root{--bg:#0b0b0c;--panel:#111214;--accent:#00fff9;--muted:#9aa0a6}
+*{box-sizing:border-box}
+.html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,system-ui,-apple-system}
+/* Use the construction_collage image as the demo background with a subtle dark overlay for readability */
+html,body{
+	height:100%;
+	margin:0;
+	font-family:Inter,Segoe UI,Roboto,system-ui,-apple-system;
+		background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('assets/construction_collage.jpg');
+			/* Tile the image across the page and size so 3 tiles fit across the viewport */
+			background-repeat: repeat;
+			/* Make each tile take roughly one-third of the viewport width so three appear side-by-side */
+			background-size: calc(100% / 3) auto;
+			background-position: left top;
+	color:#fff;
+}
+.demo-page{display:flex;align-items:center;justify-content:center;height:100%;padding:24px}
+/* make the panel slightly translucent so the background shows through but content remains readable */
+.panel{width:100%;max-width:880px;background:rgba(17,18,20,0.78);border-radius:12px;padding:22px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.panel h1{margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 14px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
+.tab.active{border-color:var(--accent);color:var(--accent);box-shadow:0 6px 18px rgba(0,255,249,0.06)}
+.tab-panels{display:flex;gap:20px}
+.preview{width:320px;height:220px;background:#0a0a0a;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px}
+.preview video{width:100%;height:100%;object-fit:cover}
+.preview.audio{display:flex;align-items:center;justify-content:center}
+.meter{font-size:20px;color:var(--muted)}
+.controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#00bfb7);color:#071018;border:none}
+.btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04)}
+.status{color:var(--muted);font-size:13px;margin-bottom:10px}
+.demo-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.demo-footer .muted{color:var(--muted);margin:0}
+.actions{display:flex;gap:8px}
+@media(max-width:720px){.panel{padding:16px}.preview{width:100%;height:180px}.tab-panels{flex-direction:column}.demo-footer{flex-direction:column;align-items:flex-start}}

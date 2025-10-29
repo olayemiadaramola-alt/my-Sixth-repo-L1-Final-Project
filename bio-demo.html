@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Biometric Demo — ConcreteWorx</title>
+  <link rel="stylesheet" href="bio-demo.css">
+</head>
+<body>
+  <main class="demo-page">
+    <section class="panel">
+      <h1>Biometric Login (Demo)</h1>
+      <p class="lead">This is a mock demo that shows face-print and voice-print enrollment/authentication (UI only).</p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="face">Face Print</button>
+        <button class="tab" data-tab="voice">Voice Print</button>
+      </div>
+
+      <div class="tab-panels">
+        <div class="panel-tab" id="face" style="display:block;">
+          <div class="preview">
+            <video id="face-video" playsinline autoplay muted></video>
+            <canvas id="face-canvas" style="display:none"></canvas>
+          </div>
+          <div class="controls">
+            <button id="face-enroll" class="btn">Enroll Face</button>
+            <button id="face-auth" class="btn">Authenticate (Face)</button>
+            <button id="face-stop" class="btn ghost">Stop Camera</button>
+          </div>
+          <div id="face-status" class="status">Status: idle</div>
+        </div>
+
+        <div class="panel-tab" id="voice" style="display:none;">
+          <div class="preview audio">
+            <div id="audio-meter" class="meter">● ● ●</div>
+          </div>
+          <div class="controls">
+            <button id="voice-enroll" class="btn">Enroll Voice</button>
+            <button id="voice-auth" class="btn">Authenticate (Voice)</button>
+            <button id="voice-stop" class="btn ghost">Stop Microphone</button>
+          </div>
+          <div id="voice-status" class="status">Status: idle</div>
+        </div>
+      </div>
+
+      <div class="demo-footer">
+        <p class="muted">This demo simulates enrollment and matching. For real biometrics you'd use server-side verification and secure storage.</p>
+        <div class="actions">
+          <button id="demo-back" class="btn ghost">Back</button>
+          <button id="demo-continue" class="btn primary">Continue to App (simulate success)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="bio-demo.js"></script>
+</body>
+</html>

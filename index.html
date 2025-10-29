@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcreteWorx - Digital Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Sync Status Bar -->
+        <div class="sync-status-bar" id="sync-status-bar">
+            <div class="sync-info">
+                <span class="status-dot" id="sync-dot"></span>
+                <span class="sync-text" id="sync-text">All synced</span>
+            </div>
+            <div class="sync-meta">
+                <span class="sync-time" id="sync-time">Just now</span>
+                <span class="pending-badge" id="pending-badge" style="display: none;">0 pending</span>
+            </div>
+            <button class="sync-btn" id="sync-btn" onclick="manualSync()">
+                <span class="sync-icon">🔄</span>
+            </button>
+        </div>
+
+        <!-- Notification Center -->
+        <div id="notification-center" class="notification-panel">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <button class="close-notif-btn" onclick="closeNotifications()">&times;</button>
+            </div>
+            <div class="notification-list" id="notification-list">
+                <!-- Notifications will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view active">
+            <div class="header">
+                <div>
+                    <div class="greeting" id="greeting">Good Evening</div>
+                    <h1><span class="neon-text" id="user-name">Marcus</span></h1>
+                    <div class="current-time" id="current-time">7:00 PM</div>
+                    <div class="welcome-back" id="welcome-back">Welcome back! Last sync: <span id="last-sync-time">2 min ago</span></div>
+                </div>
+                <button class="notification-bell" onclick="toggleNotifications()">
+                    <span class="bell-icon">🔔</span>
+                    <span class="notif-badge" id="notif-badge">2</span>
+                </button>
+            </div>
+
+            <div class="automation-status" id="automation-status">
+                <div class="auto-indicator active">
+                    <span class="auto-icon">💾</span>
+                    <span class="auto-text">Auto-save: ON</span>
+                </div>
+                <div class="auto-indicator active">
+                    <span class="auto-icon">⏰</span>
+                    <span class="auto-text">Reminders: ON</span>
+                </div>
+            </div>
+
+            <div class="header-row">
+                <div class="weather-widget">
+                    <div class="weather-icon">⛅</div>
+                    <div class="weather-temp">62°</div>
+                    <div class="weather-condition">Partly Cloudy</div>
+                </div>
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="safety-score">97%</div>
+                        <div class="quick-stat-label">Safety Score</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="completion-rate">95%</div>
+                        <div class="quick-stat-label">On-Time Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="daily-progress">
+                <div class="progress-label">
+                    <span>Daily Progress</span>
+                    <span id="progress-percent">35%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill" style="width: 35%"></div>
+                </div>
+            </div>
+
+            <div class="stats-carousel">
+                <div class="carousel-container" id="stats-carousel">
+                    <div class="stat-card glass">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-value" data-target="4">0</div>
+                        <div class="stat-label">Today's Tasks</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value" data-target="1">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-value" data-target="2">0</div>
+                        <div class="stat-label">Active Hazards</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-value" data-target="2">0</div>
+                        <div class="stat-label">Materials Logged</div>
+                    </div>
+                </div>
+                <div class="carousel-dots" id="carousel-dots"></div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-feed" id="activity-feed">
+                    <!-- Activity items will be generated by JS -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="navigateTo('safety')">
+                    <span class="btn-icon">🛡️</span>
+                    <span class="btn-text">Daily Safety Check</span>
+                </button>
+                <button class="action-btn secondary" onclick="navigateTo('tasks')">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">My Tasks</span>
+                </button>
+                <button class="action-btn tertiary" onclick="navigateTo('materials')">
+                    <span class="btn-icon">📦</span>
+                    <span class="btn-text">Log Materials</span>
+                </button>
+            </div>
+
+            <button class="hazard-quick-btn" onclick="openHazardModal()">
+                ⚠️ Report Hazard
+            </button>
+        </div>
+
+        <!-- Safety Checklist View -->
+        <div id="safety-view" class="view">
+            <div class="header">
+                <h1>Daily Safety<br><span class="neon-text">Checklist</span></h1>
+                <div class="header-right">
+                    <div class="checklist-timer" id="checklist-timer">0:00</div>
+                    <div class="completion-indicator" id="safety-completion">
+                        <div class="circular-progress">
+                            <svg class="progress-ring" width="60" height="60">
+                                <circle class="progress-ring-bg" cx="30" cy="30" r="26"></circle>
+                                <circle class="progress-ring-bar" cx="30" cy="30" r="26" id="progress-ring"></circle>
+                            </svg>
+                            <div class="progress-text" id="progress-text">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="safety-form" class="checklist-form">
+                <div class="checklist-group">
+                    <div class="group-header" onclick="toggleGroup('ppe')">
+                        <span class="group-icon">🦺</span>
+                        <span class="group-title">Personal Protective Equipment</span>
+                        <span class="group-badge" id="ppe-badge">0/5</span>
+                        <span class="expand-icon" id="ppe-expand">▼</span>
+                    </div>
+                    <div class="checklist-items" id="ppe-items" style="display: none;">
+                        <!-- PPE items -->
+                    </div>
+                </div>
+
+                <div class="checklist-group">
+                    <div class="group-header" onclick="toggleGroup('equipment')">
+                        <span class="group-icon">🔧</span>
+                        <span class="group-title">Equipment Inspection</span>
+                        <span class="group-badge" id="equipment-badge">0/4</span>
+                        <span class="expand-icon" id="equipment-expand">▼</span>
+                    </div>
+                    <div class="checklist-items" id="equipment-items" style="display: none;">
+                        <!-- Equipment items -->
+                    </div>
+                </div>
+
+                <div class="checklist-group">
+                    <div class="group-header" onclick="toggleGroup('site')">
+                        <span class="group-icon">🏗️</span>
+                        <span class="group-title">Site Safety</span>
+                        <span class="group-badge" id="site-badge">0/5</span>
+                        <span class="expand-icon" id="site-expand">▼</span>
+                    </div>
+                    <div class="checklist-items" id="site-items" style="display: none;">
+                        <!-- Site items -->
+                    </div>
+                </div>
+
+                <div class="photo-upload-section">
+                    <div class="drag-drop-zone" id="drag-drop-zone">
+                        <input type="file" id="hazard-photo" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                        <div class="drag-content">
+                            <span class="upload-icon">📷</span>
+                            <p>Drag photo here or tap to upload</p>
+                        </div>
+                    </div>
+                    <div id="photo-preview" class="photo-preview"></div>
+                </div>
+
+                <div class="signature-section">
+                    <label class="signature-label">Digital Signature</label>
+                    <div class="signature-pad" id="signature-pad">
+                        <canvas id="signature-canvas" width="300" height="150"></canvas>
+                    </div>
+                    <button type="button" class="clear-signature" onclick="clearSignature()">Clear</button>
+                </div>
+
+                <button type="submit" class="submit-btn pulse" id="safety-submit">
+                    <span class="btn-content">Submit Safety Check</span>
+                    <span class="btn-shine"></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Tasks View -->
+        <div id="tasks-view" class="view">
+            <div class="header">
+                <h1>My Tasks<br><span class="neon-text">Today</span></h1>
+            </div>
+
+            <div class="task-filters">
+                <button class="filter-btn active" onclick="filterTasks('all')">All</button>
+                <button class="filter-btn" onclick="filterTasks('high')">High Priority</button>
+                <button class="filter-btn" onclick="filterTasks('pending')">Pending</button>
+            </div>
+
+            <div class="kanban-board">
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-icon">⏳</span>
+                        <span class="column-title">Pending</span>
+                        <span class="column-count" id="pending-count">0</span>
+                    </div>
+                    <div class="task-list" id="pending-tasks" data-status="Pending">
+                        <!-- Tasks will be generated by JS -->
+                    </div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-icon">🔄</span>
+                        <span class="column-title">In Progress</span>
+                        <span class="column-count" id="inprogress-count">0</span>
+                    </div>
+                    <div class="task-list" id="inprogress-tasks" data-status="In Progress">
+                        <!-- Tasks will be generated by JS -->
+                    </div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-icon">✅</span>
+                        <span class="column-title">Complete</span>
+                        <span class="column-count" id="complete-count">0</span>
+                    </div>
+                    <div class="task-list" id="complete-tasks" data-status="Complete">
+                        <!-- Tasks will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Hub View -->
+        <div id="training-view" class="view">
+            <div class="header">
+                <h1>Training<br><span class="neon-text">Hub</span></h1>
+            </div>
+
+            <div class="training-featured">
+                <div class="featured-card glass">
+                    <span class="featured-badge">⭐ Training of the Day</span>
+                    <h3>Silica Dust Safety</h3>
+                    <p>Learn essential protection techniques</p>
+                    <div class="featured-meta">
+                        <span>⏱️ 3 min</span>
+                        <span>🎯 60% Complete</span>
+                    </div>
+                    <button class="btn-primary" onclick="startTraining(2)">Continue</button>
+                </div>
+            </div>
+
+            <div class="training-modules" id="training-modules">
+                <!-- Training module cards will be generated by JS -->
+            </div>
+        </div>
+
+        <!-- Materials View -->
+        <div id="materials-view" class="view">
+            <div class="header">
+                <h1>Material<br><span class="neon-text">Tracking</span></h1>
+            </div>
+
+            <form id="material-form" class="material-form">
+                <div class="form-group">
+                    <label for="material-type">Material Type</label>
+                    <select id="material-type" required>
+                        <option value="">Select material...</option>
+                        <option value="Ready-Mix Concrete">Ready-Mix Concrete</option>
+                        <option value="Rebar Steel">Rebar Steel</option>
+                        <option value="Forms/Formwork">Forms/Formwork</option>
+                        <option value="Aggregate/Gravel">Aggregate/Gravel</option>
+                        <option value="Cement Bags">Cement Bags</option>
+                        <option value="Wire Mesh">Wire Mesh</option>
+                        <option value="Curing Compound">Curing Compound</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="text" id="quantity" placeholder="e.g., 5 yards, 20 bags" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="delivery-time">Delivery Time</label>
+                    <input type="time" id="delivery-time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplier">Supplier</label>
+                    <input type="text" id="supplier" placeholder="Supplier name" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Log Material Delivery
+                </button>
+            </form>
+
+            <div class="materials-log">
+                <h3>Today's Log</h3>
+                <div id="materials-list">
+                    <!-- Material log entries will be generated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analytics-view" class="view">
+            <div class="header">
+                <h1>Analytics &amp;<br><span class="neon-text">Insights</span></h1>
+            </div>
+
+            <div class="time-period-selector">
+                <button class="period-btn active" onclick="switchPeriod('week')">This Week</button>
+                <button class="period-btn" onclick="switchPeriod('month')">This Month</button>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="analytics-card glass">
+                    <h3>Task Performance</h3>
+                    <canvas id="task-chart" style="max-height: 200px;"></canvas>
+                </div>
+                <div class="analytics-card glass">
+                    <h3>Safety Compliance</h3>
+                    <div class="big-stat">
+                        <div class="big-stat-value" id="compliance-score">98%</div>
+                        <div class="big-stat-trend positive">↑ 3% from last week</div>
+                    </div>
+                    <div class="compliance-bars">
+                        <div class="compliance-item">
+                            <span>Checklists</span>
+                            <div class="mini-bar"><div class="mini-bar-fill" style="width: 100%;"></div></div>
+                            <span>100%</span>
+                        </div>
+                        <div class="compliance-item">
+                            <span>Hazard Reports</span>
+                            <div class="mini-bar"><div class="mini-bar-fill" style="width: 85%;"></div></div>
+                            <span>85%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-card glass">
+                    <h3>Time Tracking</h3>
+                    <div class="time-stats">
+                        <div class="time-stat-item">
+                            <span class="time-icon">⏱️</span>
+                            <div>
+                                <div class="time-value">2.1 hrs</div>
+                                <div class="time-label">Avg Task Time</div>
+                            </div>
+                        </div>
+                        <div class="time-stat-item">
+                            <span class="time-icon">📊</span>
+                            <div>
+                                <div class="time-value">92%</div>
+                                <div class="time-label">Efficiency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-card glass">
+                    <h3>Weekly Activity</h3>
+                    <canvas id="activity-chart" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+
+            <div class="leaderboard-section">
+                <h3>Team Leaderboard</h3>
+                <div class="leaderboard-list" id="leaderboard"></div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings-view" class="view">
+            <div class="header">
+                <h1>Settings &amp;<br><span class="neon-text">Preferences</span></h1>
+            </div>
+
+            <div class="settings-section">
+                <h3>Automation Settings</h3>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">Auto-save</div>
+                            <div class="setting-desc">Save form data every 30 seconds</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="auto-save-toggle" checked onchange="toggleAutomation('autoSave')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">Daily Reminders</div>
+                            <div class="setting-desc">Safety checklist reminder at 7:00 AM</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reminder-toggle" checked onchange="toggleAutomation('reminders')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">Task Deadline Alerts</div>
+                            <div class="setting-desc">Alert 30 minutes before deadline</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="deadline-toggle" checked onchange="toggleAutomation('deadlineAlerts')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-name">Cert Expiry Warnings</div>
+                            <div class="setting-desc">Warn 30 days before expiration</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="cert-toggle" checked onchange="toggleAutomation('certWarnings')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Data Management</h3>
+                <div class="data-actions">
+                    <button class="data-btn" onclick="exportData()">
+                        <span class="btn-icon">📥</span>
+                        <span>Export All Data (JSON)</span>
+                    </button>
+                    <button class="data-btn" onclick="viewActivityLog()">
+                        <span class="btn-icon">📋</span>
+                        <span>View Activity Log</span>
+                    </button>
+                    <button class="data-btn danger" onclick="clearCache()">
+                        <span class="btn-icon">🗑️</span>
+                        <span>Clear Cache</span>
+                    </button>
+                </div>
+                <div class="data-info">
+                    <div class="data-stat">
+                        <span>Total Records:</span>
+                        <span id="total-records">156</span>
+                    </div>
+                    <div class="data-stat">
+                        <span>Last Backup:</span>
+                        <span id="last-backup">Oct 27, 7:35 PM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profile-view" class="view">
+            <div class="header">
+                <h1>My<br><span class="neon-text">Profile</span></h1>
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-avatar glow">MJ</div>
+                <h2>Marcus Johnson</h2>
+                <p class="profile-role">Concrete Laborer</p>
+                <p class="profile-company">Brooklyn Concrete Co.</p>
+                <p class="profile-id">ID: BCO-2847</p>
+            </div>
+
+            <div class="stats-grid detailed">
+                <div class="detail-stat glass">
+                    <div class="detail-value" data-target="487">0</div>
+                    <div class="detail-label">Days Worked</div>
+                </div>
+                <div class="detail-stat glass">
+                    <div class="detail-value" data-target="1247">0</div>
+                    <div class="detail-label">Tasks Completed</div>
+                </div>
+                <div class="detail-stat glass">
+                    <div class="detail-value" data-target="34">0</div>
+                    <div class="detail-label">Hazards Reported</div>
+                </div>
+                <div class="detail-stat glass">
+                    <div class="detail-value" data-target="28">0</div>
+                    <div class="detail-label">Training Hours</div>
+                </div>
+            </div>
+
+            <div class="certifications-section">
+                <h3>Certifications</h3>
+                <div class="cert-list">
+                    <div class="cert-card active">
+                        <div class="cert-icon">🛡️</div>
+                        <div class="cert-info">
+                            <div class="cert-name">OSHA 30-Hour</div>
+                            <div class="cert-expiry">Expires: Mar 1, 2026</div>
+                        </div>
+                        <div class="cert-status status-active">Active</div>
+                    </div>
+                    <div class="cert-card expiring">
+                        <div class="cert-icon">🚜</div>
+                        <div class="cert-info">
+                            <div class="cert-name">Forklift Operator</div>
+                            <div class="cert-expiry">Expires: Dec 15, 2025</div>
+                        </div>
+                        <div class="cert-status status-expiring">Expiring Soon</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badges-section">
+                <h3>Achievement Badges</h3>
+                <div class="badges-grid">
+                    <div class="badge unlock-animation">
+                        <span class="badge-icon">🛡️</span>
+                        <span class="badge-name">Safety Certified</span>
+                        <span class="badge-date">Jan 10, 2024</span>
+                    </div>
+                    <div class="badge unlock-animation">
+                        <span class="badge-icon">💻</span>
+                        <span class="badge-name">Digital Literacy Level 2</span>
+                        <span class="badge-date">Jun 15, 2024</span>
+                    </div>
+                    <div class="badge unlock-animation">
+                        <span class="badge-icon">📋</span>
+                        <span class="badge-name">Material Tracking Expert</span>
+                        <span class="badge-date">Sep 20, 2024</span>
+                    </div>
+                    <div class="badge unlock-animation">
+                        <span class="badge-icon">⭐</span>
+                        <span class="badge-name">100 Tasks Completed</span>
+                        <span class="badge-date">Aug 5, 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hazard Report Modal -->
+        <div id="hazard-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Quick Hazard Report</h2>
+                    <button class="close-btn" onclick="closeHazardModal()">&times;</button>
+                </div>
+                <form id="hazard-form">
+                    <div class="form-group">
+                        <label for="hazard-type">Hazard Type</label>
+                        <select id="hazard-type" required>
+                            <option value="">Select type...</option>
+                            <option value="Slip/Trip Hazard">Slip/Trip Hazard</option>
+                            <option value="Fall Risk">Fall Risk</option>
+                            <option value="Equipment Malfunction">Equipment Malfunction</option>
+                            <option value="Chemical Exposure">Chemical Exposure</option>
+                            <option value="Dust/Silica">Dust/Silica</option>
+                            <option value="Heavy Machinery">Heavy Machinery</option>
+                            <option value="Weather Related">Weather Related</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hazard-location">Location</label>
+                        <input type="text" id="hazard-location" placeholder="Specific location on site" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="severity">Severity</label>
+                        <select id="severity" required>
+                            <option value="">Select severity...</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hazard-description">Description</label>
+                        <textarea id="hazard-description" rows="4" placeholder="Describe the hazard..." required></textarea>
+                    </div>
+
+                    <label class="photo-upload-btn small">
+                        <input type="file" accept="image/*" style="display: none;" onchange="handleHazardPhotoUpload(event)">
+                        <span class="btn-icon">📷</span>
+                        <span>Add Photo</span>
+                    </label>
+                    <div id="hazard-photo-preview" class="photo-preview"></div>
+
+                    <button type="submit" class="submit-btn">
+                        Submit Hazard Report
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success/Error Toast -->
+        <div id="toast" class="toast"></div>
+
+        <!-- Floating Action Button -->
+        <button class="fab" onclick="openHazardModal()" title="Quick Hazard Report">
+            <span class="fab-icon">⚠️</span>
+            <span class="fab-pulse"></span>
+        </button>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="navigateTo('dashboard')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('safety')">
+                <span class="nav-icon">🛡️</span>
+                <span class="nav-label">Safety</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('tasks')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Tasks</span>
+                <span class="notification-badge" id="tasks-badge">4</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('training')">
+                <span class="nav-icon">📚</span>
+                <span class="nav-label">Training</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('analytics')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Analytics</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+
+        <!-- Confetti Container -->
+        <div id="confetti-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
